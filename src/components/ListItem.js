@@ -1,18 +1,24 @@
 import React, { Component } from 'react';
-import { Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Text, TouchableWithoutFeedback, View, LayoutAnimation } from 'react-native';
 import { connect } from 'react-redux';
 import { CardSection } from './common';
 import * as actions from '../actions';
 
 
 class ListItem extends Component {
-  renderDescription() {
-    const { library, selectedId } = this.props;
 
-    console.log(this.props);
-    if (library.id === selectedId) {
+  // Lifecycle method called whenever component is rerendered on device
+  componentWillUpdate() {
+    LayoutAnimation.spring();
+  }
+
+  renderDescription() {
+    const { library, expanded } = this.props;
+    if (expanded) {
       return (
-        <Text>{library.description}</Text>
+        <CardSection>
+          <Text style={{ flex: 1 }}>{library.description}</Text>
+        </CardSection>
       );
     }
   }
@@ -45,8 +51,11 @@ const styles = {
   }
 };
 
-const mapStatetoProps = state => {
-  return { selectedId: state.selectedId };
+const mapStatetoProps = (state, ownProps) => {
+  // We do the logic inside of mapStatetoProps to remove it from the component
+  const expanded = state.selectedId === ownProps.library.id;
+
+  return { expanded }; // Equivalent to expanded: expanded because key and value identical
 };
 
 // First argument explicitely for mapStatetoProps so set to null
